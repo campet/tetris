@@ -30,6 +30,7 @@ public class Board extends JPanel implements ActionListener {
     int curY = 0;
     JLabel statusbar;
     Shape curPiece;
+    Shape nextPiece;
     Tetrominoes[] board;
 
 
@@ -38,6 +39,7 @@ public class Board extends JPanel implements ActionListener {
 
        setFocusable(true);
        curPiece = new Shape();
+       nextPiece = new Shape();
        timer = new Timer(400, this);
        timer.start(); 
 
@@ -50,6 +52,7 @@ public class Board extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (isFallingFinished) {
             isFallingFinished = false;
+            curPiece.setShape(nextPiece.getShape());
             newPiece();
         } else {
             oneLineDown();
@@ -72,6 +75,7 @@ public class Board extends JPanel implements ActionListener {
         numLinesRemoved = 0;
         clearBoard();
 
+        curPiece.setRandomShape();
         newPiece();
         timer.start();
     }
@@ -118,6 +122,16 @@ public class Board extends JPanel implements ActionListener {
                            curPiece.getShape());
             }
         }
+        
+        if (nextPiece.getShape() != Tetrominoes.NoShape) {
+            for (int i = 0; i < 4; ++i) {
+                int x = BoardWidth - 2 + nextPiece.x(i);
+                int y = BoardHeight - 1 + nextPiece.minY() - nextPiece.y(i);
+                drawSquare(g, 0 + x * squareWidth(),
+                           boardTop + (BoardHeight - y - 1) * squareHeight(),
+                           nextPiece.getShape());
+            }
+        }
     }
 
     private void dropDown()
@@ -154,14 +168,16 @@ public class Board extends JPanel implements ActionListener {
 
         removeFullLines();
 
-        if (!isFallingFinished)
+        if (!isFallingFinished) {
+            curPiece.setShape(nextPiece.getShape());
             newPiece();
+        }
     }
 
     private void newPiece()
     {
-        curPiece.setRandomShape();
-        curX = BoardWidth / 2 + 1;
+        nextPiece.setRandomShape();
+        curX = BoardWidth / 2;
         curY = BoardHeight - 1 + curPiece.minY();
 
         if (!tryMove(curPiece, curX, curY)) {
@@ -205,7 +221,7 @@ public class Board extends JPanel implements ActionListener {
             }
 
             if (lineIsFull) {
-                ++numFullLines;
+                numFullLines += 5;
                 for (int k = i; k < BoardHeight - 1; ++k) {
                     for (int j = 0; j < BoardWidth; ++j)
                          board[(k * BoardWidth) + j] = shapeAt(j, k + 1);
