@@ -184,7 +184,8 @@ public class Board extends JPanel implements ActionListener {
             curPiece.setShape(Tetrominoes.NoShape);
             timer.stop();
             isStarted = false;
-            statusbar.setText("game over");
+            statusbar.setText("Game over. "
+                    + "Your score: " + numLinesRemoved);
         }
     }
 
@@ -221,7 +222,7 @@ public class Board extends JPanel implements ActionListener {
             }
 
             if (lineIsFull) {
-                numFullLines += 5;
+                numFullLines++;
                 for (int k = i; k < BoardHeight - 1; ++k) {
                     for (int j = 0; j < BoardWidth; ++j)
                          board[(k * BoardWidth) + j] = shapeAt(j, k + 1);
@@ -229,7 +230,7 @@ public class Board extends JPanel implements ActionListener {
             }
         }
 
-        if (numFullLines > 0) {
+        if (numFullLines != 0) {
             numLinesRemoved += numFullLines;
             statusbar.setText(String.valueOf(numLinesRemoved));
             isFallingFinished = true;
